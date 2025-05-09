@@ -5,12 +5,23 @@ import {
   getProductsDetailsById,
 } from "../services/getAllCategory";
 import ProductCard from "../component/productCard";
+import {
+  addToCart,
+  incrementQuantity,
+  decrementQuantity,
+} from "../utils/features/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
   const [productData, setProductData] = useState({});
   const [selcetdImage, setSelectedImage] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+
+  const cartItem = useSelector((state) => state.cart);
+
+  const dispatch = useDispatch();
+  const _id = id;
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -51,6 +62,24 @@ const ProductDetailsPage = () => {
       setSelectedImage(productImages[0].image_link);
     }
   }, [productImages]);
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    dispatch(addToCart({ item: _id, quantity: 1 }));
+  };
+  const handleIncQuantity = (e) => {
+    e.stopPropagation();
+    dispatch(incrementQuantity(_id));
+  };
+
+  const handleDecQuantity = (e) => {
+    e.stopPropagation();
+    dispatch(decrementQuantity(_id));
+  };
+
+  const existingQuantity = cartItem?.cartItems?.find(
+    (item) => item.item === _id
+  );
 
   return (
     <div className="w-[80%] mx-auto mt-[30px]">
@@ -139,9 +168,32 @@ const ProductDetailsPage = () => {
             </div>
 
             <div className="flex gap-4 mt-6">
-              <button className="bg-gray-100 px-6 py-2 rounded border">
-                Add to Cart
-              </button>
+              {existingQuantity ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    className="px-2 py-1 border rounded hover:bg-green-100"
+                    onClick={handleDecQuantity}
+                  >
+                    -
+                  </button>
+                  <span className="text-sm font-medium">
+                    {existingQuantity?.quantity}
+                  </span>
+                  <button
+                    className="px-2 py-1 border rounded hover:bg-green-100"
+                    onClick={handleIncQuantity}
+                  >
+                    +
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="border border-green-400 text-green-600 rounded-md px-4 py-1 hover:bg-green-100"
+                  onClick={handleAddToCart}
+                >
+                  🛒 Add
+                </button>
+              )}
               <button className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
                 Buy now
               </button>
@@ -156,23 +208,21 @@ const ProductDetailsPage = () => {
           Related Products
         </h2>
         <div className="grid grid-cols-4 gap-6 mt-6">
- 
-            {relatedProducts?.map((item, index) => (
-              <div key={index}>
-                <ProductCard
-                  _id={item._id}
-                  image={item?.ProductImages?.[0]?.image_link}
-                  name={item.productName}
-                  rating={4}
-                  reviews={4}
-                  price={item.offerPrice}
-                  originalPrice={item.price}
-                  category={item?.category?.category_name}
-                />
-              </div>
-            ))}
-          </div>
-        
+          {relatedProducts?.map((item, index) => (
+            <div key={index}>
+              <ProductCard
+                _id={item._id}
+                image={item?.ProductImages?.[0]?.image_link}
+                name={item.productName}
+                rating={4}
+                reviews={4}
+                price={item.offerPrice}
+                originalPrice={item.price}
+                category={item?.category?.category_name}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
