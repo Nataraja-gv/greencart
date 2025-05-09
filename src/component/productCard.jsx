@@ -6,6 +6,8 @@ import {
   incrementQuantity,
   decrementQuantity,
 } from "../utils/features/cartSlice";
+import { updatePostCart } from "../services/cart/postcart";
+import { enqueueSnackbar } from "notistack";
 
 const ProductCard = ({
   image,
@@ -19,7 +21,7 @@ const ProductCard = ({
 }) => {
   const navigate = useNavigate();
   const cartItem = useSelector((state) => state.cart);
-
+  const userData = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const existingQuantity = cartItem?.cartItems?.find(
@@ -28,7 +30,11 @@ const ProductCard = ({
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    dispatch(addToCart({ item: _id, quantity: 1 }));
+    if (!userData.name) {
+      navigate("/login");
+    } else {
+      dispatch(addToCart({ item: _id, quantity: 1 }));
+    }
   };
   const handleIncQuantity = (e) => {
     e.stopPropagation();
@@ -42,9 +48,13 @@ const ProductCard = ({
 
   useEffect(() => {
     const postUpdateCart = async () => {
-      const res= await 
+      if (cartItem?.cartItems?.length > 0) {
+        await updatePostCart(cartItem);
+      }
     };
-  }, [cartItem]);
+
+    postUpdateCart();
+  }, [cartItem?.cartItems]);
 
   {
     return (

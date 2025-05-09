@@ -3,9 +3,17 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { userLogout } from "../services/userAuth/userlogout";
 import { useSnackbar } from "notistack";
+import { useNavigate } from "react-router";
 
 const NavBar = () => {
   const userData = useSelector((state) => state.user);
+  const cartItem = useSelector((state) => state.cart);
+  const navigate=useNavigate()
+
+  const totalQuantity = cartItem?.cartItems?.reduce(
+    (acc, item) => ({ quantity: acc.quantity + item.quantity }),
+    { quantity: 0 }
+  )?.quantity;
 
   const { enqueueSnackbar } = useSnackbar();
   const handleLogout = async () => {
@@ -59,7 +67,14 @@ const NavBar = () => {
           </label>
 
           {/* Shopping Cart Icon */}
-          <ShoppingCart className="cursor-pointer" />
+          <div className="flex relative">
+            <ShoppingCart className="cursor-pointer"  onClick={()=>navigate("/cart")}/>
+            {totalQuantity > 0 && (
+              <span className="bg-green-500 text-white rounded-full text-xs absolute top-[-15px] right-[-5px] px-2 h-6 flex items-center justify-center">
+                {totalQuantity}
+              </span>
+            )}
+          </div>
 
           {/* User Avatar and Dropdown */}
           <div className="dropdown dropdown-end">

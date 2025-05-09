@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
   getAllProduct,
   getProductsDetailsById,
@@ -17,9 +17,9 @@ const ProductDetailsPage = () => {
   const [productData, setProductData] = useState({});
   const [selcetdImage, setSelectedImage] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
-
+  const navigate = useNavigate();
   const cartItem = useSelector((state) => state.cart);
-
+  const userData = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const _id = id;
 
@@ -65,7 +65,11 @@ const ProductDetailsPage = () => {
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    dispatch(addToCart({ item: _id, quantity: 1 }));
+    if (userData.name) {
+      dispatch(addToCart({ item: _id, quantity: 1 }));
+    } else {
+      navigate("/login");
+    }
   };
   const handleIncQuantity = (e) => {
     e.stopPropagation();
