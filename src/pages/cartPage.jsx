@@ -5,13 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart } from "../utils/features/cartSlice";
 import { patchCartItems } from "../services/cart/deleteCart";
 import { enqueueSnackbar, useSnackbar } from "notistack";
+import { getUserAddress } from "../services/cart/getAddress";
 
 const CartPage = () => {
-  const [showAddress, setShowAddress] = useState(false);
   const [cartData, setCartData] = useState();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [refershCart, setRefershCart] = useState(false);
+  const [address, setAddress] = useState();
 
   useEffect(() => {
     const fetchCartData = async () => {
@@ -20,6 +21,15 @@ const CartPage = () => {
     };
     fetchCartData();
   }, [refershCart]);
+
+  useEffect(() => {
+    const fetchAddressData = async () => {
+      const response = await getUserAddress();
+      setAddress(response);
+    };
+    fetchAddressData();
+  }, []);
+  const [selectedAddress, setSelectedAddress] = useState(address);
 
   const dispatch = useDispatch();
   // const handleRemoveFromCart = (productId) => {
@@ -42,6 +52,9 @@ const CartPage = () => {
   };
 
   const totalItemsInCart = cartData?.cartItems?.length;
+  const handleChange = (e) => {
+    setSelectedAddress(e.target.value);
+  };
 
   return (
     <div className="flex flex-col md:flex-row py-16 max-w-6xl w-full px-6 mx-auto">
@@ -150,30 +163,31 @@ const CartPage = () => {
 
         <div className="mb-6">
           <p className="text-sm font-medium uppercase">Delivery Address</p>
-          <div className="relative flex justify-between items-start mt-2">
-            <p className="text-gray-500">No address found</p>
-            <button
-              onClick={() => setShowAddress(!showAddress)}
-              className="text-indigo-500 hover:underline cursor-pointer"
+          <div className="relative flex flex-col justify-between items-center mt-2">
+            <div className="flex flex-col gap-2">
+              <select
+                className="select select-success w-full max-w-xs"
+                value={selectedAddress}
+                onChange={handleChange}
+              >
+                <option value="" disabled>
+                  -- Select an Address --
+                </option>
+                {address?.map((item, index) => (
+                  <option key={item._id} value={item._id}>
+                    {item.addressLine1}, {item.city}, {item.state},{" "}
+                    {item.country} - {item.zipCode}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <p
+              onClick={() => navigate("/add/address")}
+              className="text-green-500 text-center cursor-pointer mt-4 p-2 hover:bg-indigo-500/10"
             >
-              Change
-            </button>
-            {showAddress && (
-              <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full">
-                <p
-                  onClick={() => setShowAddress(false)}
-                  className="text-gray-500 p-2 hover:bg-gray-100"
-                >
-                  New York, USA
-                </p>
-                <p
-                  onClick={() => setShowAddress(false)}
-                  className="text-indigo-500 text-center cursor-pointer p-2 hover:bg-indigo-500/10"
-                >
-                  Add address
-                </p>
-              </div>
-            )}
+              Add address
+            </p>
           </div>
 
           <p className="text-sm font-medium uppercase mt-6">Payment Method</p>

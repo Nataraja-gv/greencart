@@ -12,6 +12,8 @@ import AddProduct from "../section/addProduct";
 import CartPage from "../pages/cartPage";
 import SellerCategory from "../pages/sellerCategory";
 import AddCategory from "../section/addCategory";
+import NoPage from "../pages/noPage";
+import AddAddress from "../pages/add_address";
 
 const Routers = () => {
   return (
@@ -22,6 +24,8 @@ const Routers = () => {
           <Route path="cart" element={<CartPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<SignUp />} />
+          <Route path="add/address" element={<AddAddress />} />
+
           <Route path="product/:id" element={<ProductDetailsPage />} />
 
           <Route path="/seller/login" element={<SellerLoginPage />} />
@@ -35,7 +39,7 @@ const Routers = () => {
             <Route path="category/add" element={<AddCategory />} />
           </Route>
 
-          <Route path="*" element={<h1>404 Not Found</h1>} />
+          <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
