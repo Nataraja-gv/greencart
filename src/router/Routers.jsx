@@ -14,6 +14,7 @@ import SellerCategory from "../pages/sellerCategory";
 import AddCategory from "../section/addCategory";
 import NoPage from "../pages/noPage";
 import AddAddress from "../pages/add_address";
+import SellerOrders from "../pages/sellerOrders";
 
 const Routers = () => {
   return (
@@ -37,6 +38,7 @@ const Routers = () => {
             <Route path="product/edit/:id" element={<AddProduct />} />
             <Route path="category" element={<SellerCategory />} />
             <Route path="category/add" element={<AddCategory />} />
+            <Route path="orders" element={<SellerOrders />} />
           </Route>
 
           <Route path="*" element={<NoPage />} />

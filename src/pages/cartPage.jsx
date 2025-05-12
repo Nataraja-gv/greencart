@@ -2,10 +2,15 @@ import { useEffect, useState } from "react";
 import { getCartItems } from "../services/cart/getCart";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { removeFromCart } from "../utils/features/cartSlice";
+import { clearCart, removeFromCart } from "../utils/features/cartSlice";
 import { patchCartItems } from "../services/cart/deleteCart";
 import { enqueueSnackbar, useSnackbar } from "notistack";
 import { getUserAddress } from "../services/cart/getAddress";
+import {
+  clearCartItem,
+  orderToPlaced,
+  updatePostCart,
+} from "../services/cart/postcart";
 
 const CartPage = () => {
   const [cartData, setCartData] = useState();
@@ -13,6 +18,8 @@ const CartPage = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [refershCart, setRefershCart] = useState(false);
   const [address, setAddress] = useState();
+  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const cartItem = useSelector((state) => state.cart);
 
   useEffect(() => {
     const fetchCartData = async () => {
@@ -54,6 +61,47 @@ const CartPage = () => {
   const totalItemsInCart = cartData?.cartItems?.length;
   const handleChange = (e) => {
     setSelectedAddress(e.target.value);
+  };
+
+  const cartItemDetails = cartData?.cartItems;
+  let totalPrice = 0;
+  cartItemDetails?.forEach((item) => {
+    totalPrice += item?.item?.offerPrice * item?.quantity;
+  });
+
+  const tax = (totalPrice * 2) / 100;
+  const totalAmount = totalPrice + tax;
+
+  const handleClearCart = async () => {
+    try {
+      await clearCartItem();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSubmitToOrder = async () => {
+    const data = {
+      address: selectedAddress,
+      paymentType: paymentMethod,
+      items: cartData?.cartItems.map((item) => ({
+        item: item.item?._id,
+        quantity: item.quantity,
+      })),
+    };
+
+    try {
+      const response = await orderToPlaced(data);
+      if (response) {
+        dispatch(clearCart());
+        await handleClearCart();
+
+        navigate("/");
+        enqueueSnackbar("Order placed successfully", { variant: "success" });
+      }
+    } catch (error) {
+      enqueueSnackbar(error.message, { variant: "error" });
+    }
   };
 
   return (
@@ -108,7 +156,7 @@ const CartPage = () => {
                   </div>
                 </div>
                 <p className="text-center">
-                  ${product?.item?.offerPrice * product?.quantity}
+                  Rs.{product?.item?.offerPrice * product?.quantity}
                 </p>
                 <button
                   className="cursor-pointer mx-auto"
@@ -170,9 +218,7 @@ const CartPage = () => {
                 value={selectedAddress}
                 onChange={handleChange}
               >
-                <option value="" disabled>
-                  -- Select an Address --
-                </option>
+                <option value="">-- Select an Address --</option>
                 {address?.map((item, index) => (
                   <option key={item._id} value={item._id}>
                     {item.addressLine1}, {item.city}, {item.state},{" "}
@@ -192,9 +238,13 @@ const CartPage = () => {
 
           <p className="text-sm font-medium uppercase mt-6">Payment Method</p>
 
-          <select className="w-full border border-gray-300 bg-white px-3 py-2 mt-2 outline-none">
-            <option value="COD">Cash On Delivery</option>
-            <option value="Online">Online Payment</option>
+          <select
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            className="w-full border border-gray-300 bg-white px-3 py-2 mt-2 outline-none"
+          >
+            <option value="cod">Cash On Delivery</option>
+            <option value="online">Online Payment</option>
           </select>
         </div>
 
@@ -203,7 +253,7 @@ const CartPage = () => {
         <div className="text-gray-500 mt-4 space-y-2">
           <p className="flex justify-between">
             <span>Price</span>
-            <span>{}</span>
+            <span>{totalPrice}</span>
           </p>
           <p className="flex justify-between">
             <span>Shipping Fee</span>
@@ -211,15 +261,18 @@ const CartPage = () => {
           </p>
           <p className="flex justify-between">
             <span>Tax (2%)</span>
-            <span>$20</span>
+            <span>{tax}</span>
           </p>
           <p className="flex justify-between text-lg font-medium mt-3">
             <span>Total Amount:</span>
-            <span>$20</span>
+            <span>{totalAmount}</span>
           </p>
         </div>
 
-        <button className="w-full py-3 mt-6 cursor-pointer bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition">
+        <button
+          onClick={handleSubmitToOrder}
+          className="w-full py-3 mt-6 cursor-pointer bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition"
+        >
           Place Order
         </button>
       </div>
