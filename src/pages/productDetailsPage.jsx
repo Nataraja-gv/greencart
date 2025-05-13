@@ -85,6 +85,15 @@ const ProductDetailsPage = () => {
     (item) => item.item === _id
   );
 
+  const handleBuyNow = (e) => {
+    e.stopPropagation();
+    if (userData.name) {
+      dispatch(addToCart({ item: _id, quantity: 1 }));
+      navigate("/cart");
+    } else {
+      navigate("/login");
+    }
+  };
   return (
     <div className="w-[80%] mx-auto mt-[30px]">
       {/* Breadcrumb */}
@@ -198,7 +207,10 @@ const ProductDetailsPage = () => {
                   🛒 Add
                 </button>
               )}
-              <button className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+              <button
+                className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+                onClick={handleBuyNow}
+              >
                 Buy now
               </button>
             </div>
@@ -212,20 +224,22 @@ const ProductDetailsPage = () => {
           Related Products
         </h2>
         <div className="grid grid-cols-4 gap-6 mt-6">
-          {relatedProducts?.map((item, index) => (
-            <div key={index}>
-              <ProductCard
-                _id={item._id}
-                image={item?.ProductImages?.[0]?.image_link}
-                name={item.productName}
-                rating={4}
-                reviews={4}
-                price={item.offerPrice}
-                originalPrice={item.price}
-                category={item?.category?.category_name}
-              />
-            </div>
-          ))}
+          {relatedProducts
+            ?.filter((item) => item.inStock !== false)
+            ?.map((item, index) => (
+              <div key={index}>
+                <ProductCard
+                  _id={item._id}
+                  image={item?.ProductImages?.[0]?.image_link}
+                  name={item.productName}
+                  rating={4}
+                  reviews={4}
+                  price={item.offerPrice}
+                  originalPrice={item.price}
+                  category={item?.category?.category_name}
+                />
+              </div>
+            ))}
         </div>
       </div>
     </div>

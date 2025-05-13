@@ -15,6 +15,8 @@ import AddCategory from "../section/addCategory";
 import NoPage from "../pages/noPage";
 import AddAddress from "../pages/add_address";
 import SellerOrders from "../pages/sellerOrders";
+import UserProfile from "../pages/userProfile";
+import SearchProduct from "../pages/searchProduct";
 
 const Routers = () => {
   return (
@@ -26,9 +28,9 @@ const Routers = () => {
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<SignUp />} />
           <Route path="add/address" element={<AddAddress />} />
-
+          <Route path="/profile" element={<UserProfile />} />
           <Route path="product/:id" element={<ProductDetailsPage />} />
-
+          <Route path="/search" element={<SearchProduct />} />
           <Route path="/seller/login" element={<SellerLoginPage />} />
 
           <Route path="/seller" element={<SellerDashBoard />}>

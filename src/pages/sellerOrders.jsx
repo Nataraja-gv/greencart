@@ -11,7 +11,7 @@ const SellerOrders = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const res = await getSellerOrders(page,limit);
+      const res = await getSellerOrders(page, limit);
       if (res) {
         setOrders(res?.data);
         setTotalPages(res?.totalPages);
@@ -41,12 +41,11 @@ const SellerOrders = () => {
         status: orders[index].status,
         isPaid: orders[index].isPaid,
       };
-      const res = await patchOrderUpdate(id, payload);
-      if (res) {
-        enqueueSnackbar("Order updated successfully", {
-          variant: "success",
-        });
-      }
+      await patchOrderUpdate(id, payload);
+
+      enqueueSnackbar("Order updated successfully", {
+        variant: "success",
+      });
     } catch (error) {
       console.error(error.message);
       enqueueSnackbar("Failed to update order", { variant: "error" });

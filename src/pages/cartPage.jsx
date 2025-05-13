@@ -27,7 +27,7 @@ const CartPage = () => {
       setCartData(response);
     };
     fetchCartData();
-  }, [refershCart]);
+  }, [refershCart,cartItem]);
 
   useEffect(() => {
     const fetchAddressData = async () => {

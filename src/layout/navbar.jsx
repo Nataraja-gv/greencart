@@ -1,14 +1,17 @@
 import { ShoppingCart } from "lucide-react";
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userLogout } from "../services/userAuth/userlogout";
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router";
+import { clearSearchTerm, setSearchTerm } from "../utils/features/searchSlice";
 
 const NavBar = () => {
   const userData = useSelector((state) => state.user);
   const cartItem = useSelector((state) => state.cart);
-  const navigate=useNavigate()
+  const searchTerm = useSelector((state) => state.search);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const totalQuantity = cartItem?.cartItems?.reduce(
     (acc, item) => ({ quantity: acc.quantity + item.quantity }),
@@ -21,6 +24,14 @@ const NavBar = () => {
     enqueueSnackbar(res.message, {
       variant: "error",
     });
+  };
+  const handleSearch = (e) => {
+    const searchTerm = e.target.value;
+    if (searchTerm) {
+      dispatch(setSearchTerm(searchTerm));
+    } else {
+      dispatch(clearSearchTerm());
+    }
   };
 
   return (
@@ -52,15 +63,24 @@ const NavBar = () => {
             >
               Home
             </li>
-            <li className="font-medium cursor-pointer">All Products</li>
+            <li
+              className="font-medium cursor-pointer"
+              onClick={() => navigate("/search")}
+            >
+              All Products
+            </li>
           </ul>
 
           {/* Search Input */}
-          <label className="input input-success w-[300px] rounded-[20px] flex items-center">
+          <label
+            className="input input-success w-[300px] rounded-[20px] flex items-center"
+            onClick={() => navigate("/search")}
+          >
             <SearchIcon className="h-[1em] opacity-50" />
             <input
               type="search"
               required
+              onChange={handleSearch}
               placeholder="Search Products"
               className="border-none focus:outline-none w-full ml-2"
             />
@@ -68,7 +88,10 @@ const NavBar = () => {
 
           {/* Shopping Cart Icon */}
           <div className="flex relative">
-            <ShoppingCart className="cursor-pointer"  onClick={()=>navigate("/cart")}/>
+            <ShoppingCart
+              className="cursor-pointer"
+              onClick={() => navigate("/cart")}
+            />
             {totalQuantity > 0 && (
               <span className="bg-green-500 text-white rounded-full text-xs absolute top-[-15px] right-[-5px] px-2 h-6 flex items-center justify-center">
                 {totalQuantity}
@@ -97,7 +120,12 @@ const NavBar = () => {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-52 p-2 shadow"
             >
               <li>
-                <span className="justify-between">Profile</span>
+                <span
+                  className="justify-between"
+                  onClick={() => navigate("/profile")}
+                >
+                  Profile
+                </span>
               </li>
               <li>
                 {userData?.name ? (
