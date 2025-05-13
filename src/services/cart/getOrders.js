@@ -1,7 +1,7 @@
 import { enqueueSnackbar } from "notistack";
 import axiosInstance from "../../utils/axiosInstance";
 
-export const getSellerOrders = async () => {
+export const getSellerOrders = async (page,limit) => {
   const config = {
     method: "GET",
     maxBodyLength: Infinity,
@@ -9,10 +9,14 @@ export const getSellerOrders = async () => {
     headers: {
       "Content-Type": "application/json",
     },
+    params:{
+      page,
+      limit
+    }
   };
   try {
     const res = await axiosInstance.request(config);
-    return res?.data?.data;
+    return res?.data;
   } catch (error) {
     enqueueSnackbar(error?.message, { variant: "error" });
   }

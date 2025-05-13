@@ -1,21 +1,24 @@
- import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getSellerOrders, patchOrderUpdate } from "../services/cart/getOrders";
 import { useSnackbar } from "notistack";
 
 const SellerOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(5);
+  const [totalPages, setTotalPages] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const res = await getSellerOrders();
+      const res = await getSellerOrders(page,limit);
       if (res) {
-        setOrders(res);
+        setOrders(res?.data);
+        setTotalPages(res?.totalPages);
       }
     };
     fetchOrders();
-  }, []);
- 
+  }, [page]);
 
   const handleChangeStatus = (index, value) => {
     const updatedOrders = [...orders];
@@ -25,31 +28,30 @@ const SellerOrders = () => {
 
   const handleChangeIsPaid = (index, value) => {
     const updatedOrders = [...orders];
-    updatedOrders[index] = { 
-      ...updatedOrders[index], 
-      isPaid: value === "true"   
+    updatedOrders[index] = {
+      ...updatedOrders[index],
+      isPaid: value === "true",
     };
     setOrders(updatedOrders);
   };
 
- const handleUpdateSubmit = async (id, index) => {
-  try {
-    const payload = {
-      status: orders[index].status,
-      isPaid: orders[index].isPaid,
-    };
-    const res = await patchOrderUpdate(id, payload);
-    if (res) {
-      enqueueSnackbar("Order updated successfully", {
-        variant: "success",
-      });
+  const handleUpdateSubmit = async (id, index) => {
+    try {
+      const payload = {
+        status: orders[index].status,
+        isPaid: orders[index].isPaid,
+      };
+      const res = await patchOrderUpdate(id, payload);
+      if (res) {
+        enqueueSnackbar("Order updated successfully", {
+          variant: "success",
+        });
+      }
+    } catch (error) {
+      console.error(error.message);
+      enqueueSnackbar("Failed to update order", { variant: "error" });
     }
-  } catch (error) {
-    console.error(error.message);
-    enqueueSnackbar("Failed to update order", { variant: "error" });
-  }
-};
-
+  };
 
   return (
     <div>
@@ -101,9 +103,7 @@ const SellerOrders = () => {
                   <select
                     value={item.isPaid}
                     className="select select-bordered w-full"
-                    onChange={(e) =>
-                      handleChangeIsPaid(index, e.target.value)
-                    }
+                    onChange={(e) => handleChangeIsPaid(index, e.target.value)}
                   >
                     <option value={true}>Paid</option>
                     <option value={false}>Not paid</option>
@@ -121,6 +121,25 @@ const SellerOrders = () => {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="flex justify-center items-center p-4 gap-2">
+        <button
+          className="btn"
+          disabled={page <= 1}
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+        >
+          «
+        </button>
+        <span className="px-4">
+          Page {page} of {totalPages}
+        </span>
+        <button
+          className="btn"
+          disabled={page >= totalPages}
+          onClick={() => setPage((prev) => prev + 1)}
+        >
+          »
+        </button>
       </div>
     </div>
   );
