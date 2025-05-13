@@ -17,6 +17,7 @@ import AddAddress from "../pages/add_address";
 import SellerOrders from "../pages/sellerOrders";
 import UserProfile from "../pages/userProfile";
 import SearchProduct from "../pages/searchProduct";
+import Reportpage from "../pages/reportpage";
 
 const Routers = () => {
   return (
@@ -34,7 +35,7 @@ const Routers = () => {
           <Route path="/seller/login" element={<SellerLoginPage />} />
 
           <Route path="/seller" element={<SellerDashBoard />}>
-            <Route index element={<h1>Seller Dashboard Home</h1>} />
+            <Route index element={<Reportpage />} />
             <Route path="product" element={<SellerProduct />} />
             <Route path="product/add" element={<AddProduct />} />
             <Route path="product/edit/:id" element={<AddProduct />} />

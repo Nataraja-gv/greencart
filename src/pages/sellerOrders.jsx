@@ -51,6 +51,7 @@ const SellerOrders = () => {
       enqueueSnackbar("Failed to update order", { variant: "error" });
     }
   };
+  console.log(orders, "oo");
 
   return (
     <div>
@@ -63,6 +64,8 @@ const SellerOrders = () => {
               <th className="text-left p-2 text-[15px]">Product</th>
               <th className="text-left p-2 text-[15px]">Quantity</th>
               <th className="text-left p-2 text-[15px]">Total Amount</th>
+              <th className="text-left p-2 text-[15px]">Payment Type</th>
+
               <th className="text-left p-2 text-[15px]">Address</th>
               <th className="text-left p-2 text-[15px]">Status</th>
               <th className="text-left p-2 text-[15px]">isPaid</th>
@@ -81,6 +84,8 @@ const SellerOrders = () => {
                   {item?.items?.map((it) => it?.quantity).join(", ")}
                 </td>
                 <td className="p-2 text-[15px]">Rs. {item?.totalAmount}</td>
+                <td className="p-2 text-[15px]"> {item?.paymentType}</td>
+
                 <td className="p-2 text-[15px]">
                   {item?.address?.addressLine1}, {item?.address?.city},{" "}
                   {item?.address?.state}, {item?.address?.country} -{" "}
