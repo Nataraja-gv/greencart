@@ -1,8 +1,8 @@
 import { CloudUpload, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { getAllCatgory } from "../services/getAllCategory";
-import { RadioGroup } from "@radix-ui/themes";
-import RadioGroups from "../component/radioGroup";
+ 
+import RadioGroups from "../component/radiogroup";
 import { useSnackbar } from "notistack";
 import { addProduct } from "../services/product/postProduct";
 import { useLocation, useNavigate } from "react-router";
